@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 gem 'rails',        '~> 5.1.6'
 gem 'bcrypt'
 gem 'faker'
+gem 'rails-i18n' # 今回はこのgemを追加しています。
 gem 'bootstrap-sass'
 gem 'will_paginate' # この行を追加してください。
 gem 'bootstrap-will_paginate' # この行を追加してください。
