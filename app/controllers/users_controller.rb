@@ -5,10 +5,27 @@ class UsersController < ApplicationController
   before_action :admin_user, only: [:destroy, :edit_basic_info, :update_basic_info]
   before_action :set_one_month, only: :show
 
+  #def index
+  #  @users = User.paginate(page: params[:page])
+  #end
+  
   def index
-    @users = User.paginate(page: params[:page])
+    #条件分岐
+    #@users = if params[:search]
+    #searchされた場合は、原文+.where('name LIKE ?', "%#{params[:search]}%")を実行
+    #User.where(activated: true).paginate(page: params[:page]).where('name LIKE ?', "%#{params[:search]}%")
+    #@users = User.paginate(page: params[:page]).search(params[:search])
+    @users = User.paginate(page: params[:page]).where('name LIKE ?', "%#{params[:search]}%")
+    User.search("search")
+    if params[:search].blank?
+      flash.now[:danger] = "検索欄を入力してください。"
+    else
+    #searchされていない場合は、原文そのまま
+      User.paginate(page: params[:page])
+    #@users = User.where(activated: true).paginate(page: params[:page]).search(params[:search])
+    end
   end
-
+  
   def show
     @worked_sum = @attendances.where.not(started_at: nil).count
   end
