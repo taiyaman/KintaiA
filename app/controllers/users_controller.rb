@@ -18,7 +18,6 @@ class UsersController < ApplicationController
     @users = User.paginate(page: params[:page]).where('name LIKE ?', "%#{params[:search]}%")
     User.search("search")
     if params[:search].blank?
-      flash.now[:danger] = "検索欄を入力してください。"
     else
     #searchされていない場合は、原文そのまま
       User.paginate(page: params[:page])

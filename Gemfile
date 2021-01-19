@@ -3,6 +3,7 @@ source 'https://rubygems.org'
 gem 'rails',        '~> 5.1.6'
 gem 'bcrypt'
 gem 'faker'
+gem 'rounding' # 追加機能 No10
 gem 'rails-i18n' # 今回はこのgemを追加しています。
 gem 'bootstrap-sass'
 gem 'will_paginate' # この行を追加してください。
