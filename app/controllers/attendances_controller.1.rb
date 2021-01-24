@@ -1,6 +1,6 @@
 class AttendancesController < ApplicationController
   #↓追記後の状態となります。
-  include AttendancesHelper
+  include AttendacesHelper
   before_action :set_user, only: [:edit_one_month, :update_one_month]
   before_action :logged_in_user, only: [:update, :edit_one_month]
   before_action :admin_or_correct_user, only: [:update, :edit_one_month, :update_one_month]
