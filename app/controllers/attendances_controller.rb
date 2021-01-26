@@ -47,6 +47,7 @@ class AttendancesController < ApplicationController
 #  end
 
   def update_one_month
+   # debugger
     ActiveRecord::Base.transaction do
       if attendances_invalid?
         attendances_params.each do |id, item|

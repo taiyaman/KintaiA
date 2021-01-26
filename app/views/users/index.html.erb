@@ -1,11 +1,11 @@
 <% provide(:title, 'All Users') %>
 <h1>ユーザー一覧</h1>
 
-<div class="col-md-10 col-md-offset-1">
-<p>検索</p>
+<div class="pull-right search">
+<p class="example">ユーザー名検索</p>
   <%= form_tag(users_path,:method => 'get') do %>
     <%= text_field_tag :search %>
-    <%= submit_tag 'Search', :name => nil %>
+    <%= submit_tag '検索', :name => nil , class: "btn btn-primary" %>
   <% end %>
 </div>
 
