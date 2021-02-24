@@ -10,23 +10,43 @@ class UsersController < ApplicationController
   #  @users = User.paginate(page: params[:page])
   #end
   
-  def index
+  #def index
     #条件分岐
     #@users = if params[:search]
     #searchされた場合は、原文+.where('name LIKE ?', "%#{params[:search]}%")を実行
     #User.where(activated: true).paginate(page: params[:page]).where('name LIKE ?', "%#{params[:search]}%")
     #@users = User.paginate(page: params[:page]).search(params[:search])
-    @users = User.paginate(page: params[:page]).where('name LIKE ?', "%#{params[:search]}%")
-    User.search("search")
-    if params[:search].blank?
-    else
+    #@users = User.paginate(page: params[:page]).where('name LIKE ?', "%#{params[:search]}%")
+    #User.search("search")
+    #if params[:search].blank?
+    #else
     #searchされていない場合は、原文そのまま
-      User.paginate(page: params[:page])
+    #  User.paginate(page: params[:page])
     #@users = User.where(activated: true).paginate(page: params[:page]).search(params[:search])
+    #end
+  #end
+
+  def index
+    @users = User.all
+  end
+
+  # def index
+  #   @users = User.all
+  # end
+
+  def import
+    if params[:file].blank?
+      flash[:warning] = "CSVファイルが選択されておりません"
+      redirect_to users_url
+    else
+      User.import(params[:file])
+      flash[:success] = "インポートに成功しました。"
+      redirect_to users_url
     end
   end
   
   def show
+    @attendances_list = Attendance.where(name: current_user.name).where.not(user_id: params[:id])
     @worked_sum = @attendances.where.not(started_at: nil).count
   end
 
@@ -75,13 +95,17 @@ class UsersController < ApplicationController
     redirect_to users_url
   end
 
+  def index_attendance
+    @users = User.all.includes(:attendances)
+  end
+
   private
 
     def user_params
-      params.require(:user).permit(:name, :email, :department, :password, :password_confirmation)
+      params.require(:user).permit(:name, :email, :department, :employee_number, :uid, :password, :basic_time, :work_start_time, :work_end_time)
     end
 
     def basic_info_params
       params.require(:user).permit(:department, :basic_time, :work_time)
     end
-end
+  end
