@@ -16,9 +16,11 @@ gem 'coffee-rails', '~> 4.2'
 gem 'jquery-rails'
 gem 'turbolinks',   '~> 5'
 gem 'jbuilder',     '~> 2.5'
+#gem 'rails_12factor', group: :production
 
 group :development, :test do
   gem 'sqlite3', '1.3.13'
+  #gem 'pg', '0.20.0'
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
 end
 
@@ -31,6 +33,7 @@ end
 
 group :production do
   gem 'pg', '0.20.0'
+  gem 'rails_12factor'
 end
 
 # Windows環境ではtzinfo-dataというgemを含める必要があります

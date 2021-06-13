@@ -48,8 +48,8 @@ ActiveRecord::Schema.define(version: 20210606113616) do
     t.boolean "next_day"
     t.string "business_process"
     t.string "confirmation"
-    t.datetime "defalut_work_start_time", default: "2021-06-12 23:30:00"
-    t.datetime "defalut_work_end_time", default: "2021-06-13 08:30:00"
+    t.datetime "defalut_work_start_time", default: "2021-06-13 23:30:00"
+    t.datetime "defalut_work_end_time", default: "2021-06-14 08:30:00"
     t.boolean "change"
     t.string "overtime_status"
     t.string "change2"
@@ -84,15 +84,15 @@ ActiveRecord::Schema.define(version: 20210606113616) do
     t.string "remember_digest"
     t.boolean "admin", default: false
     t.string "department"
-    t.datetime "basic_time", default: "2021-06-12 23:00:00"
-    t.datetime "work_time", default: "2021-06-12 22:30:00"
+    t.datetime "basic_time", default: "2021-06-13 23:00:00"
+    t.datetime "work_time", default: "2021-06-13 22:30:00"
     t.integer "employees_number"
     t.integer "uid"
     t.datetime "work_start_time"
     t.datetime "work_end_time"
     t.boolean "superior"
-    t.datetime "defalut_work_start_time", default: "2021-06-12 23:30:00"
-    t.datetime "defalut_work_end_time", default: "2021-06-13 08:30:00"
+    t.datetime "defalut_work_start_time", default: "2021-06-13 23:30:00"
+    t.datetime "defalut_work_end_time", default: "2021-06-14 08:30:00"
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
