@@ -7,15 +7,13 @@
   <% end %>
 
 <table class="table table-bordered table-hover">
-  <% @users.each do |user| %>
+  <% @users.where.not(id: @user.id).each do |user| %>
     <tr>
       <td>
         <div class="col-md-11 col-md-offset-1">
           <% if current_user.admin? || current_user?(user) %>
           <%= user.name %><br>
-          <%= link_to "削除", user, method: :delete,
-                                    data: { confirm: "削除してもよろしいですか？" },
-                                    class: "btn btn-primary btn-default" %><br>
+          <%= link_to "削除", user, method: :delete,data: { confirm: "削除してもよろしいですか？" },class: "btn btn-primary btn-default" %><br>
           <div class="panel-group">
             <div class="panel panel-default">
               <div class="panel-heading">
@@ -25,11 +23,6 @@
               </div>
               <div id="collapse<%= user.id %>" class="panel-collapse collapse">
                 <div class="panel-body"><%= render partial: 'users/form1', locals: { user:user } %></div>
-                <%
-=begin%>
- partial: 'template', locals: {group: @groups} 
-<%
-=end%>
               </div>
             </div>
           </div>

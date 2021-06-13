@@ -15,6 +15,7 @@ class User < ApplicationRecord
   validates :work_time, presence: true
   has_secure_password
   validates :password, presence: true, length: { minimum: 6 }, allow_nil: true
+  #validates :admin_login
 
   # 渡された文字列のハッシュ値を返します。
   def User.digest(string)
@@ -65,6 +66,10 @@ class User < ApplicationRecord
   def forget
     update_attribute(:remember_digest, nil)
   end
+
+  #def admin_login
+  #   redirect_to users_path if name == "admin@email.com" && password == "password"
+  #end
   
   def self.search(search) #ここでのself.はUser.を意味する
     if search

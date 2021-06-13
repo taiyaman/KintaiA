@@ -64,3 +64,25 @@ font-weight: bold;
   margin: 15px 0;
   width: 30%;
 }
+
+.box-txt {
+  display:inline-block;
+  padding: 0.5em 1em;
+  margin: 2em 0;
+  font-weight: bold;
+  border: solid 2px #0000ff;
+ }
+ .box-txt p {
+  margin: 0; 
+  padding: 0;
+ }
+
+ span strong {
+   color: #ff0000;
+   position: relative;
+   margin: 2em auto;
+   width: 90%;
+   color: #ff0000; /* 文字色 */
+   background-color: #fff;
+   border: 2px solid #ff0000;
+ }

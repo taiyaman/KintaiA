@@ -1,4 +1,7 @@
-
+<% provide(:class_text, 'basic-info') %>
+<% provide(:button_text, '変更を送信する') %>
+​
+<%= form_with(model: @attendance, url: update_overtime_request_user_attendance_path(@user, @attendance), local: true, method: :patch) do |f| %>
 <div class="modal-dialog modal-lg modal-dialog-center">
   <div class="modal-content">
     <div class="modal-header">
@@ -6,6 +9,42 @@
         <span aria-hidden="true">&times;</span>
       </button>
       <h1 class="modal-title">【残業申請】</h1>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-10 col-md-offset-1">
+             <table class="table table-bordered table-condensed table-hover table-striped" id="table-attendances">
+              <thead>
+                <tr>
+                  <th>日付</th>
+                  <th>曜日</th>
+                  <th>終了予定時間</th>
+                  <th>翌日</th>
+                  <th>業務処理内容</th>
+                  <th>支持者確認㊞</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><%= l(@attendance.worked_on, format: :short) %></td>
+                  <td><%= $days_of_the_week[@attendance.worked_on.wday] %></td>
+                  <td><%= f.time_select :scheduled_end_time, class: "form-control" %></td>
+                  <td><%= f.check_box :next_day,{},checked_value = "true",unchecked_value = "false" %></td>
+                  <td><%= f.text_field :business_process, class: "form-control" , required: true %></td> 
+                  <td><%= f.collection_select(:confirmation_id_zangyou, User.all.where(superior: true).where.not(id: params[:user_id]), :id, :name, {prompt: ""}, required: true) %></td>
+                  <%= f.hidden_field :overtime_status, :value => "申請中" %>
+                </tr>
+              </tbody>
+            </table>
+            <div class="center">
+              <%= f.submit yield(:button_text), class: "btn btn-primary btn-#{yield(:class_text)}" %>
+              <button type="button" class="btn btn-default btn-<%= yield(:class_text) %>" data-dismiss="modal">
+                キャンセル
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
+<% end %>

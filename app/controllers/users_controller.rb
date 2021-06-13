@@ -2,37 +2,17 @@ class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
   before_action :logged_in_user, only: [:index, :edit, :update, :destroy, :edit_basic_info, :update_basic_info]
   before_action :correct_user, only: [:edit, :update]
-  before_action :admin_user, only: [:destroy, :edit_basic_info, :update_basic_info]
+  before_action :admin_user, only: [:destroy, :edit_basic_info, :update_basic_info, :index_attendance, :user_basic_update, :index]
   before_action :set_one_month, only: :show
   before_action :admin_or_correct_user, only: :show
   
-  #def index
-  #  @users = User.paginate(page: params[:page])
-  #end
-  
-  #def index
-    #条件分岐
-    #@users = if params[:search]
-    #searchされた場合は、原文+.where('name LIKE ?', "%#{params[:search]}%")を実行
-    #User.where(activated: true).paginate(page: params[:page]).where('name LIKE ?', "%#{params[:search]}%")
-    #@users = User.paginate(page: params[:page]).search(params[:search])
-    #@users = User.paginate(page: params[:page]).where('name LIKE ?', "%#{params[:search]}%")
-    #User.search("search")
-    #if params[:search].blank?
-    #else
-    #searchされていない場合は、原文そのまま
-    #  User.paginate(page: params[:page])
-    #@users = User.where(activated: true).paginate(page: params[:page]).search(params[:search])
-    #end
-  #end
-
-  def index
-    @users = User.all
+  def user_basic_update
   end
-
-  # def index
-  #   @users = User.all
-  # end
+  
+  def index
+    @users = User.all 
+    @user = User.find("1")
+  end
 
   def import
     if params[:file].blank?
@@ -46,8 +26,34 @@ class UsersController < ApplicationController
   end
   
   def show
-    @attendances_list = Attendance.where(name: current_user.name).where.not(user_id: params[:id])
-    @worked_sum = @attendances.where.not(started_at: nil).count
+    if params[:id] == "1"
+      redirect_to root_url 
+    else
+      @user = User.find(params[:id])
+      @users = User.all
+      @apply1 = Apply.all.where(authorizer: params[:id]) #申請件数を表示
+      @applies = @apply1.group(:month)
+      @applies3 = @apply1.group(:month).group(:user_name)
+      @applies_test = @apply1.select(:month,:user_name, :authorizer_name).distinct
+      @applies_group = @applies3.where(change: false).or(@applies3.where(change: nil))
+      @applies_count = @applies_group.sum(:month).count
+      @apply2 = Apply.all.where(user_name: User.find(params[:id]).name)
+      @applies2 = @apply2.group(:month)
+      #applies3 = @apply2.group(:month).group(:user_name).having('count(*) >= 1').maximum(:id)
+      #@applies4 = Apply.all.where(month: @applies3.keys,user_name: @applies3.keys).where.not(id: @applies3.values).destroy_all 
+      #debugger
+      @oneday = @user.attendances.where(worked_on: @first_day).order(:worked_on)
+      @attendances_list = Attendance.where.not(user_id: params[:id])
+      @notices = @attendances_list.where.not(scheduled_end_time: nil)
+      @notices_toA_sum_test = @notices.where(confirmation_id_zangyou: 2)
+      @notices_toA_sum2 = @notices_toA_sum_test.where(overtime_status: "申請中").or(@notices_toA_sum_test.where(change: false)).or(@notices_toA_sum_test.where(change: nil)).count
+      @notices_toB_sum_test = @notices.where(confirmation_id_zangyou: 3)
+      @notices_toB_sum2 = @notices_toB_sum_test.where(overtime_status: "申請中").or(@notices_toB_sum_test.where(change: false)).or(@notices_toB_sum_test.where(change: nil)).count
+      @notices1 = @attendances_list.where.not(confirmation_change: @users.name)
+      @notices2 = @notices1.where(change_attendance: nil).or(@notices1.where(confirmation_change_status: "申請中"))
+      @notices_count = @notices2.where(confirmation_id: params[:id]).count
+      @worked_sum1 = @attendances.where(change_attendance: true).or(@attendances.where.not(started_at: nil)).count
+    end
   end
 
   def new
@@ -92,6 +98,7 @@ class UsersController < ApplicationController
     else
       flash[:danger] = "#{@user.name}の更新は失敗しました。<br>" + @user.errors.full_messages.join("<br>")
     end
+    
     redirect_to users_url
   end
 
@@ -106,6 +113,14 @@ class UsersController < ApplicationController
     end
 
     def basic_info_params
-      params.require(:user).permit(:department, :basic_time, :work_time)
+      params.require(:user).permit(:name, :email, :department, :employees_number, :uid, :password, :basic_time, :defalut_work_start_time, :defalut_work_end_time)
+    end
+
+    def admin_or_correct_user
+      @user = User.find(params[:user_id]) if @user.blank?
+      unless current_user?(@user) || current_user.admin?
+        flash[:danger] = "権限がありません。"
+        redirect_to(root_url)
+      end  
     end
   end

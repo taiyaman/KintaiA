@@ -1,0 +1,194 @@
+<% provide(:title, @user.name) %>
+<div class="container">
+  <div>
+    <table class="table table-bordered table-condensed user-table" id="table-attendances">
+      <tr>
+        <td>
+          <%= l(@first_day, format: :middle) %>&emsp;時間管理表
+        </td>
+
+        <td rowspam="2">
+          指定勤務開始時間　<%= @user.defalut_work_start_time.strftime('%H:%M') %></br>
+          指定勤務終了時間　<%= @user.defalut_work_end_time.strftime('%H:%M') %>
+        </td> 
+
+        <td colspan="3"><%= format_basic_info(@user.work_time) %>　基本時間</td> 
+        <td>初日　<%= l(@first_day, format: :short) %></td>
+      </tr>
+      
+      <tr>
+        <td>所属　<%= @user.department.present? ? @user.department : "未所属" %></td>
+        <td>名前　<%= @user.name %></td>
+        <td>コード</td>
+        <td><%= @user.employees_number %></td>
+        <td>出勤日数　<%= @worked_sum %>日</td>
+        <td>締め　<%= l(@last_day, format: :short) %></td>
+      </tr>
+    </table>
+  </div>
+    <div class="btn-users-show">
+    <span><%= link_to "勤怠画面に戻る", current_user, class: "btn btn-primary" %></span>
+  </div>
+  <div>
+    <table class="table table-bordered table-condensed table-hover table-striped" id="table-attendances">
+      <thead>
+        <tr>
+          <th rowspan="3">日付</th>
+          <th rowspan="3">曜日</th>
+          <th colspan="8">【実績】</th>
+          <th colspan="6">所定外勤務</th>
+        </tr>
+        <tr>
+          <th colspan="3">出社</th>
+          <th colspan="3">退社</th>
+          <th rowspan="3">在社時間</th>
+          <th rowspan="3">備考</th>
+          <th colspan="2">終了予定時間</th>
+          <th rowspan="2">時間外時間</th>
+          <th rowspan="2">業務処理内容</th>
+          <th rowspan="2">支持者確認㊞</th>
+        </tr>
+        <tr>
+          <th>時</th>
+          <th>分</th>
+          <th></th>
+          <th>時</th>
+          <th>分</th>
+          <th></th>
+          <th>時</th>
+          <th>分</th>
+        </tr>
+      </thead>
+      
+      <tbody>
+        <% @attendances.each do |day| %>
+          <tr>
+            <td><%= l(day.worked_on, format: :short) %></td>
+            <td class= "<%= css_class(day.worked_on) %>"><%= $days_of_the_week[day.worked_on.wday] %></td>
+            <% if day.before_started_at.present? && day.change_attendance == true && day.confirmation_change_status == "承認" %>
+              <td><%= l(day.before_started_at.floor_to(60*15), format: :hour) %></td>
+            <% elsif day.started_at.present? && day.change_attendance == nil %>
+              <td><%= l(day.started_at.floor_to(60*15), format: :hour) %></td>
+            <% else%>
+              <td></td>
+            <% end %>
+            <% if day.before_started_at.present? && day.change_attendance == true && day.confirmation_change_status == "承認" %>
+              <td><%= l(day.before_started_at.floor_to(60*15), format: :time) %></td>
+            <% elsif day.started_at.present? && day.change_attendance == nil %>
+              <td><%= l(day.started_at.floor_to(60*15), format: :time) %></td>
+            <% else%>
+              <td></td>
+            <% end %>
+            <td></td>
+            <% if day.before_finished_at.present? && day.change_attendance == true && day.confirmation_change_status == "承認" %>
+              <td><%= l(day.before_finished_at.floor_to(60*15), format: :hour) %></td>
+            <% elsif day.finished_at.present? && day.change_attendance == nil %>
+              <td><%= l(day.finished_at.floor_to(60*15), format: :hour) %></td>
+            <% else%>
+               <td></td>
+            <% end %>
+            <% if day.before_finished_at.present? && day.change_attendance == true && day.confirmation_change_status == "承認" %>
+              <td><%= l(day.before_finished_at.floor_to(60*15), format: :time) %></td>
+            <% elsif day.finished_at.present? && day.change_attendance == nil %>
+              <td><%= l(day.finished_at.floor_to(60*15), format: :time) %></td>
+            <% else%>
+               <td></td>
+            <% end %>
+            <td></td>
+            <td>
+              <% if day.started_at.present? && day.finished_at.present? && day.before_started_at.present? && day.before_finished_at.present? && day.change_attendance == true && day.next_day2 == true && day.confirmation_change_status == "承認" %>
+                <%= str_times =  format("%.2f", (((day.before_finished_at.floor_to(60*15) - day.before_started_at.floor_to(60*15)) / 60) / 60.0) + 24) %>
+                <% @total_working_time = @total_working_time.to_f + str_times.to_f %>
+              <% elsif day.started_at.present? && day.finished_at.present? && day.before_started_at.present? && day.before_finished_at.present? && day.change_attendance == true && day.confirmation_change_status == "承認" %>
+                <%= str_times =  format("%.2f", (((day.before_finished_at.floor_to(60*15) - day.before_started_at.floor_to(60*15)) / 60) / 60.0)) %>
+                <% @total_working_time = @total_working_time.to_f + str_times.to_f %>
+              <% elsif day.before_started_at.present? && day.before_finished_at.present?  && day.before_finished_at.present? && day.change_attendance == true && day.next_day2 == true && day.confirmation_change_status == "承認" %>
+                <%= str_times =  format("%.2f", (((day.before_finished_at.floor_to(60*15) - day.before_started_at.floor_to(60*15)) / 60) / 60.0) + 24) %>
+                <% @total_working_time = @total_working_time.to_f + str_times.to_f %>
+              <% elsif day.before_started_at.present? && day.before_finished_at.present?  && day.before_finished_at.present? && day.change_attendance == true && day.confirmation_change_status == "承認" %>
+                <%= str_times =  format("%.2f", (((day.before_finished_at.floor_to(60*15) - day.before_started_at.floor_to(60*15)) / 60) / 60.0)) %>
+                <% @total_working_time = @total_working_time.to_f + str_times.to_f %>
+              <% elsif day.started_at.present? && day.finished_at.present? %>
+                <%= str_times =  format("%.2f", (((day.finished_at.floor_to(60*15) - day.started_at.floor_to(60*15)) / 60) / 60.0)) %>
+                <% @total_working_time = @total_working_time.to_f + str_times.to_f %>
+              <% end %>
+            </td>
+            <td><%= day.note %></td>
+            <td><%= l(day.scheduled_end_time, format: :hour) if day.scheduled_end_time.present? %></td>
+            <td><%= l(day.scheduled_end_time.floor_to(60*15), format: :time) if day.scheduled_end_time.present? %></td>
+            <td>
+              <% if day.scheduled_end_time? && day.next_day == false %>
+                <%= str_times = (((day.scheduled_end_time.floor_to(60*15) - day.scheduled_end_time.change(hour:17).change(min:30).floor_to(60*15)) / 60) / 60) %>
+              <% elsif day.scheduled_end_time? && day.next_day == true %> 
+                <%= str_times = (((day.scheduled_end_time.floor_to(60*15) - day.scheduled_end_time.change(hour:17).change(min:30).floor_to(60*15)) / 60) / 60) + 24 %>
+              <% end %>
+            </td>
+            <td><%= day.business_process %></td>
+            <% if day.overtime_status != "申請中" && day.confirmation_id_zangyou? && day.change == true %>
+              <td>
+                <%= @users.find(day.confirmation_id_zangyou).name %><%= 'に残業申請:' %><%= day.overtime_status %></br>
+                <% if day.confirmation_change_status != "申請中" && day.change_attendance == true %>
+                  <%= @users.find(day.confirmation_id).name %><%= 'に勤怠変更申請:' %><%= day.confirmation_change_status %></br>
+                <% elsif day.confirmation_change_status? && day.confirmation_change_status != "申請中" && day.change_attendance == nil %>
+                  <%= @users.find(day.confirmation_id).name %><%= 'に勤怠変更申請:'%><%= "申請中" %></br>
+                <% elsif day.confirmation_change_status == "申請中" && day.change_attendance == nil && day.confirmation_id? %>
+                  <%= @users.find(day.confirmation_id).name %><%= 'に勤怠変更申請:'%><%= "申請中" %>
+                <% end %>
+              </td>
+            <% elsif day.confirmation_id_zangyou? && [day.overtime_status == "申請中" || day.change == false] %>
+              <td>
+                <%= @users.find(day.confirmation_id_zangyou).name %><%= 'に残業申請:' %><%= "申請中" %></br>
+                <% if day.confirmation_change_status != "申請中" && day.change_attendance == true %>
+                  <%= @users.find(day.confirmation_id).name %><%= 'に勤怠変更申請:' %><%= day.confirmation_change_status %></br>
+                <% elsif day.confirmation_change_status? && day.confirmation_change_status != "申請中" && day.change_attendance == nil %>
+                  <%= @users.find(day.confirmation_id).name %><%= 'に勤怠変更申請:'%><%= "申請中" %></br>
+                <% elsif day.confirmation_change_status == "申請中" && day.change_attendance == nil && day.confirmation_id? %>
+                  <%= @users.find(day.confirmation_id).name %><%= 'に勤怠変更申請:'%><%= "申請中" %>
+                <% end %>
+              </td> 
+            <% elsif day.confirmation_change_status == "申請中" && day.confirmation_id? %>
+              <td>
+                <%= @users.find(day.confirmation_id).name %><%= 'に勤怠変更:' %><%= day.confirmation_change_status %></br>
+                <% if day.overtime_status != "申請中" && day.confirmation_id_zangyou? && day.change == true %>
+                  <%= @users.find(day.confirmation_id_zangyou).name %><%= 'に残業申請:' %><%= day.overtime_status %></br>
+                <% elsif day.overtime_status == "申請中" && day.confirmation_id_zangyou? && day.change == true  %>
+                  <%= @users.find(day.confirmation_id_zangyou).name %><%= 'に残業申請:' %><%= day.overtime_status %></br>
+                <% end %>
+              </td>
+            <% elsif day.confirmation_change_status != "申請中" && day.confirmation_id? && day.change_attendance == nil %>
+              <td>
+                <%= @users.find(day.confirmation_id).name %><%= 'に勤怠変更申請:' %><%= "申請中" %></br>
+                <% if day.overtime_status != "申請中" && day.confirmation_id_zangyou? && day.change == true %>
+                  <%= @users.find(day.confirmation_id_zangyou).name %><%= 'に残業申請:' %><%= day.overtime_status %></br>
+                <% elsif day.overtime_status == "申請中" && day.confirmation_id_zangyou? && day.change == true  %>
+                  <%= @users.find(day.confirmation_id_zangyou).name %><%= 'に残業申請:'%><%= day.overtime_status %></br>
+                <% end %>
+              </td>
+            <% elsif day.confirmation_change_status != "申請中" && day.confirmation_change? && day.change_attendance == true %>
+              <td>
+                <%= @users.find(day.confirmation_id).name %><%= 'に勤怠変更:' %><%= day.confirmation_change_status %></br>
+                <% if day.overtime_status != "申請中" && day.confirmation_id_zangyou? && day.change == true %>
+                  <%= @users.find(day.confirmation_id_zangyou).name %><%= 'に残業申請:' %><%= day.overtime_status %></br>
+                <% elsif day.overtime_status == "申請中" && day.confirmation_id_zangyou? && day.change == true %>
+                  <%= @users.find(day.confirmation_id_zangyou).name %><%= 'に残業申請:' %><%= day.overtime_status %></br>
+                <% end %>
+              </td>
+            <% else %>
+              <td></td>
+            <% end %>
+          </tr>
+        <% end %>
+        <tfoot>
+        <tr>
+          <td rowspan="3"></td>
+          <td colspan="2" rowspam="3"></td>
+          <td colspan="5" rowspam="3"></td>
+          <td rowspam="3"><%= format("%.2f", @total_working_time.to_f) %></td>
+          <td colspan="6" rowspam="3"></td>
+        </tr>
+        </tfoot>
+      </tbody>
+    </table>
+  </div>
+</div>
+​

@@ -1,0 +1,13 @@
+<%= form_with(model: @base, url: basis_path(@base), local: true, method: :patch) do |f| %>
+
+​  <%= f.label :base_id, class: "label-#{yield(:class_text)}" %>
+  <%= f.text_field :base_id, class: "form-control" %>
+​
+  <%= f.label :name, class: "label-#{yield(:class_text)}" %>
+  <%= f.text_field :name, class: "form-control" %>
+​
+  <%= f.label :attendance, class: "label-#{yield(:class_text)}" %>
+  <%= f.text_field :attendance, :placeholder => "出勤または退勤を入力する", class: "form-control" %>
+​
+  <%= f.submit yield(:button_text), class: "btn btn-primary btn-block btn-#{yield(:class_text)}" %>
+<% end %>

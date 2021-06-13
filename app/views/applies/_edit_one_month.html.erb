@@ -1,0 +1,52 @@
+<% provide(:class_text, 'basic-info') %>
+<% provide(:button_text, '変更を送信する') %>
+​
+<%= form_with(model: @user,url: update_one_month_user_apply_path(), local: true, method: :patch) do |f| %>
+<div class="modal-dialog modal-lg modal-dialog-center">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <% @apply_users.each do |user| %>
+        <h1 class="modal-title"><%= "【" + user.name  + "からの１ヶ月分の勤怠申請】" %></h1>     
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+                <table class="table table-bordered table-condensed table-hover table-striped" id="table-attendances">
+                  <thead>
+                    <tr>
+                      <th>月</th>
+                      <th>指定者確認印</th>
+                      <th>変更</th>
+                      <th>勤怠を確認</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% @applies.where(user_name: user.name).each do |day| %>
+                        <%= f.fields_for "applies[]" ,day do |apply| %>
+                          <tr>
+                            <td><%= day.month&.strftime('%-m月') %></td>
+                            <td><%= apply.select :authorizer_name, {'申請中': "申請中", '承認': "承認", '否認': "否認", 'なし': "なし"}, { class: 'form-control' , required: true } %></td>
+                            <td><%= apply.check_box :change,{},checked_value = "true",unchecked_value = "false" %></td>
+                            <td><%= link_to "確認", edit_one_month_show_user_apply_path(name: day.user_name,month: day.month), class: "btn btn-primary" %></td>
+                            <%= apply.hidden_field :updated_at, :value => Time.now %>
+                         </tr>
+                        <% end %>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+      <% end %>
+      <div class="center">
+        <%= f.submit yield(:button_text), class: "btn btn-primary btn-#{yield(:class_text)}" %>
+          <button type="button" class="btn btn-default btn-<#%= yield(:class_text) %>" data-dismiss="modal">
+            キャンセル
+          </button>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>

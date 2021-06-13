@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  Apply: MyString
+  month: 2021-05-09
+  mark: 1
+  authorizer: 1
+  user: one
+
+two:
+  Apply: MyString
+  month: 2021-05-09
+  mark: 1
+  authorizer: 1
+  user: two

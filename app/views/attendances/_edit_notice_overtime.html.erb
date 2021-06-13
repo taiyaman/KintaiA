@@ -1,0 +1,71 @@
+<% provide(:class_text, 'basic-info') %>
+<% provide(:button_text, '変更を送信する') %>
+​
+<%= form_with(model: @user,url: update_notice_overtime_user_attendance_path(), local: true, method: :patch) do |f| %>
+<div class="modal-dialog modal-lg modal-dialog-center">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+      <% @notice_users.each do |user| %>
+        <h1 class="modal-title"><%= "【" + user.name + "からの残業申請】" %></h1>     
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-10 col-md-offset-1">
+                <table class="table table-bordered table-condensed table-hover table-striped" id="table-attendances">
+                  <thead>
+                    <tr>
+                      <th>日付</th>
+                      <th>曜日</th>
+                      <th>終了予定時間</th>
+                      <th>指定勤務終了時間</th>
+                      <th>時間外時間</th>
+                      <th>業務処理内容</th>
+                      <th>指定確認印</th>
+                      <th>変更</th>
+                      <th>勤怠を確認</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% @notices_to.where(user_id: user.id).each do |day| %>
+                      <%= f.fields_for "attendances[]" ,day do |attendance| %>
+                        <% if day.overtime_status == "申請中" && day.confirmation_id_zangyou? || day.change == nil || day.change == false   %>
+                        <tr>
+                          <td><%= l(day.worked_on, format: :short) %></td>
+                          <td><%= $days_of_the_week[day.worked_on.wday] %></td>
+                          <td>
+                             <%= day.scheduled_end_time.strftime("%H:%M") if day.scheduled_end_time.present? %>
+                          </td>
+                          <td><%= day.defalut_work_end_time.strftime('%H:%M') %></td>
+                          <td>
+                          <% if day.scheduled_end_time? && day.next_day == false %>
+                            <%= str_times = (((day.scheduled_end_time.floor_to(60*15) - day.scheduled_end_time.change(hour:17).change(min:30).floor_to(60*15)) / 60) / 60) %>
+                          <% elsif day.scheduled_end_time? && day.next_day == true %> 
+                            <%= str_times = (((day.scheduled_end_time.floor_to(60*15) - day.scheduled_end_time.change(hour:17).change(min:30).floor_to(60*15)) / 60) / 60) + 24 %>
+                          <% end %>
+                          </td>
+                          <td><%= day.business_process%></td>
+                          <td><%= attendance.select :overtime_status, {'申請中': "申請中", '承認': "承認", '否認': "否認", 'なし': "なし"}, { class: 'form-control' , required: true } %></td>
+                          <td><%= attendance.check_box :change, {class: "change"}, true, false %></td>
+                          <td><%= link_to "確認", attendances_edit_one_month_show_user_attendance_path(id: day.user_id,worked_on: day.worked_on.beginning_of_month), class: "btn btn-primary" %></td>
+                        </tr>
+                        <% end %>
+                      <% end %>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+      <% end %>
+      <div class="center">
+        <%= f.submit yield(:button_text), class: "btn btn-primary btn-#{yield(:class_text)}" %>
+          <button type="button" class="btn btn-default btn-<#%= yield(:class_text) %>" data-dismiss="modal">
+            キャンセル
+          </button>
+      </div>
+    </div>
+  </div>
+</div>
+<% end %>
