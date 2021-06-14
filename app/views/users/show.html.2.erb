@@ -264,31 +264,13 @@
           <td colspan="5" rowspam="3"></td>
           <td>
             <%= "所属長申請" %>
-            <% @firstday.each do |day| %>
-              <% @applies2.where(month: day.worked_on).last(1).each do |apply| %>
-                <% if apply.month == day.worked_on %>
-                  <% if apply.authorizer_name? && apply.authorizer_name != "申請中" && apply.change == true %>
-                    <%= ":" %><%= @users.find(apply.authorizer).name + "から" %><%= apply.authorizer_name %>
-                  <% elsif apply.authorizer_name != "申請中" %>
-                    <%= ":"%><%= @users.find(apply.authorizer).name %><%="に申請中" %>
-                    <% break %>
-                  <% elsif apply.authorizer_name == "申請中" %>
-                    <%= ":"%><%= @users.find(apply.authorizer).name %><%="に申請中" %>
-                    <% break %>
-                  <% elsif apply.authorizer_name == "申請中" %>
-                    <%= ":"%><%= @users.find(apply.authorizer).name %><%="に申請中" %>
-                    <% break %>
-                  <% end %>
-                <% end %>
-              <% end %>
               <%= form_with(model: @apply, url: user_apply_path(@user), method: :patch, local: true) do |f| %>
                 <%= f.collection_select(:authorizer, User.where(superior: true).where.not(id: params[:id]), :id, :name, {prompt: ""}) %>
                 <%= f.submit "申請", class: "btn btn-primary" %>
                 <%= f.hidden_field :authorizer_name, :value => "申請中" %>
                 <%= f.hidden_field :user_name, :value => @user.name %>
-                <%= f.hidden_field :month, :value => day.worked_on %>
               <% end %>
-            <% end %>
+            <!% end %>
           </td>
         </tr>
       </tfoot>

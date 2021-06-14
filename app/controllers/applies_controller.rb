@@ -28,7 +28,7 @@ class AppliesController < ApplicationController
             elsif @apply.authorizer == nil 
               flash[:danger] = "申請相手を選択してください。"
             elsif @apply.update_attributes!(apply_params)
-              Apply.where(user_name: @user.name).where(month: @apply.month).update_all(authorizer_name: "申請中")
+              #Apply.where(user_name: @user.name).where(month: @apply.month).update(authorizer_name: "申請中")
               flash[:success] = "ユーザー情報を更新しました。"
             else
               flash[:danger] = "申請に失敗いたしました。"  
@@ -53,12 +53,12 @@ class AppliesController < ApplicationController
         @user = User.find(params[:id])
         @users = User.find(params[:user_id])
         @apply1 = Apply.where(authorizer: params[:user_id]) # 申請した人のapply表示。
-        @apply1_group = @apply1.group(:month).group(:user_name)
+        #@apply1_group = @apply1.group(:month).group(:user_name)
         #@applies = @apply1_group.where(authorizer_name: "申請中")
-        @applies = @apply1_group.where(change: false).or(@apply1_group.where(change: nil))
+        @applies = @apply1.where(change: false).or(@apply1.where(change: nil)).or(@apply1.where(authorizer_name: "申請中"))
         #@applies_count = @apply1_group.where(authorizer_name: "申請中").sum(:month).count
         @apply_users = User.all.where(name: @applies.where(authorizer: @users.id).select(:user_name))
-       # debugger
+        #debugger
     end
 
     def update_one_month
@@ -69,11 +69,13 @@ class AppliesController < ApplicationController
         apply = Apply.find(id)
         apply.update_attributes!(item)
         #debugger
-          if apply.change == true
+          if apply.change == true && apply.authorizer_name != "申請中"
             #debugger
             Apply.where(authorizer: @user.id).where(user_name: apply.user_name).where(month: apply.month).update_all(authorizer_name: apply.authorizer_name)
-            flash[:success] = "残業申請のお知らせを変更しました。"     
-          else 
+            flash[:success] = "一ヶ月分の勤怠申請を確認しました。"     
+          elsif apply.change == true && apply.authorizer_name == "申請中"
+            flash[:success] = "一ヶ月分の勤怠申請を確認しました。" 
+          else
             #debugger
             flash[:danger] = "変更欄に未チェックの申請があります。" 
           end 

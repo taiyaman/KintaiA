@@ -37,12 +37,12 @@ class UsersController < ApplicationController
       #@applies_test = @apply1.select(:month,:user_name, :authorizer_name).distinct
       #@applies_group = @applies3.where(change: false).or(@applies3.where(change: nil))
       #@applies_count = @applies_group.sum(:month).count
-      @applies_count1 = @apply1.where(change: nil).count
-      @applies_count2 = @apply1.where(change: false).count
-      @applies_count = @applies_count1 + @applies_count2 
+      @applies_count1 = @apply1.where(change: nil).or(@apply1.where(change: false)).or(@apply1.where(authorizer_name: "申請中"))
+      @applies_count = @applies_count1.count
+      #@applies_count3 = @apply1.where(authorizer_name: "申請中").count
+      #@applies_count = @applies_count1 + @applies_count2 + @applies_count3 
       #debugger
-      @apply2 = Apply.all.where(user_name: User.find(params[:id]).name)
-      @applies2 = @apply2.group(:month)
+      @applies2 = Apply.all.where(user_name: User.find(params[:id]).name)
       @oneday = @user.attendances.where(worked_on: @first_day).order(:worked_on)
       @attendances_list = Attendance.where.not(user_id: params[:id])
       @notices = @attendances_list.where.not(scheduled_end_time: nil)
