@@ -34,14 +34,15 @@ class UsersController < ApplicationController
       @apply1 = Apply.all.where(authorizer: params[:id]) #申請件数を表示
       @applies = @apply1.group(:month)
       @applies3 = @apply1.group(:month).group(:user_name)
-      @applies_test = @apply1.select(:month,:user_name, :authorizer_name).distinct
-      @applies_group = @applies3.where(change: false).or(@applies3.where(change: nil))
-      @applies_count = @applies_group.sum(:month).count
+      #@applies_test = @apply1.select(:month,:user_name, :authorizer_name).distinct
+      #@applies_group = @applies3.where(change: false).or(@applies3.where(change: nil))
+      #@applies_count = @applies_group.sum(:month).count
+      @applies_count1 = @apply1.where(change: nil).count
+      @applies_count2 = @apply1.where(change: false).count
+      @applies_count = @applies_count1 + @applies_count2 
+      #debugger
       @apply2 = Apply.all.where(user_name: User.find(params[:id]).name)
       @applies2 = @apply2.group(:month)
-      #applies3 = @apply2.group(:month).group(:user_name).having('count(*) >= 1').maximum(:id)
-      #@applies4 = Apply.all.where(month: @applies3.keys,user_name: @applies3.keys).where.not(id: @applies3.values).destroy_all 
-      #debugger
       @oneday = @user.attendances.where(worked_on: @first_day).order(:worked_on)
       @attendances_list = Attendance.where.not(user_id: params[:id])
       @notices = @attendances_list.where.not(scheduled_end_time: nil)
@@ -123,4 +124,4 @@ class UsersController < ApplicationController
         redirect_to(root_url)
       end  
     end
-  end
+end

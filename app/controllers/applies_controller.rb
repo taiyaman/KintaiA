@@ -14,17 +14,37 @@ class AppliesController < ApplicationController
     end
   
     def update
+        #debugger
         @user = User.find(params[:id])
         @apply = Apply.new(apply_params)
+        @apply_test = Apply.all.where(user_name: @user.name).where(month: params[:month]).last(1)
+        @apply_count = Apply.all.where(user_name: @user.name).where(month: params[:month]).count
         #debugger
-        if @apply.authorizer == nil
-          flash[:danger] = "申請相手を選択してください。"
-        elsif @apply.update_attributes!(apply_params)
-          Apply.where(user_name: @user.name).where(month: @apply.month).update_all(authorizer_name: "申請中")
-          flash[:success] = "ユーザー情報を更新しました。"
-        else
-          flash[:danger] = "申請に失敗いたしました。"  
+        if @apply_count > 0 
+          @apply_test.each do |apply|
+            if apply.authorizer_name == "申請中" || apply.change == false || apply.change == nil
+             flash[:danger] = "既にに申請中です。"
+             break
+            elsif @apply.authorizer == nil 
+              flash[:danger] = "申請相手を選択してください。"
+            elsif @apply.update_attributes!(apply_params)
+              Apply.where(user_name: @user.name).where(month: @apply.month).update_all(authorizer_name: "申請中")
+              flash[:success] = "ユーザー情報を更新しました。"
+            else
+              flash[:danger] = "申請に失敗いたしました。"  
+            end
+          end
+        elsif @apply_count == 0
+          if @apply.authorizer == nil
+            flash[:danger] = "申請相手を選択してください。"
+          elsif @apply.update_attributes!(apply_params)
+            Apply.where(user_name: @user.name).where(month: @apply.month).update_all(authorizer_name: "申請中")
+            flash[:success] = "ユーザー情報を更新しました。"
+          else
+            flash[:danger] = "申請に失敗いたしました。"  
+          end
         end
+       
         #debugger
         redirect_to @user
     end
@@ -82,5 +102,4 @@ class AppliesController < ApplicationController
     def update_apply_params
       params.require(:user).permit(applies: [:authorizer_name, :change, :updated_at])[:applies]
     end
-
 end

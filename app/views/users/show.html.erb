@@ -285,7 +285,7 @@
                 <%= f.submit "申請", class: "btn btn-primary" %>
                 <%= f.hidden_field :authorizer_name, :value => "申請中" %>
                 <%= f.hidden_field :user_name, :value => @user.name %>
-                <%= f.hidden_field :month, :value => day.worked_on%>
+                <%= f.hidden_field :month, :value => day.worked_on %>
               <% end %>
             <% end %>
           </td>
