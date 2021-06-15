@@ -148,7 +148,7 @@ class AttendancesController < ApplicationController
     @notice_users = User.where(id: @attendances.where(change_attendance: nil).or(@attendances.where(change_attendance: false)).or(@attendances.where(confirmation_change_status: "申請中")).select(:user_id))
     @attendances_list = Attendance.where.not(user_id: params[:id])
     @notices1 = @attendances_list.where.not(confirmation_change: @users.name)
-    @notices = @notices1.where(confirmation_id: params[:id]).where(change_attendance: nil).or(@notices1.where(confirmation_id: params[:id]).where(change_attendance: false))
+    @notices = @notices1.where(confirmation_id: params[:id]).where(change_attendance: nil).or(@notices1.where(confirmation_id: params[:id]).where(change_attendance: false)).or(@notices1.where(confirmation_change_status: "申請中").where(change_attendance: true))
     @notices_count = @notices.where(confirmation_id: params[:id]).count
   end
 
